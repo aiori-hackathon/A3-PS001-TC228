@@ -22,3 +22,18 @@ desktop.ini
 
 # Generated experiment output
 data/temp/
+
+# Generated test files
+test_files/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated evaluation results
+data/results.csv
+
+# Android build files
+.gradle/
+**/build/
+local.properties

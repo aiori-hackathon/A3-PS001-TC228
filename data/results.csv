@@ -24,3 +24,17 @@ attack_slow.sh,2,attack,0,,,1
 attack_slow.sh,3,attack,0,,,1
 attack_slow.sh,4,attack,0,,,1
 attack_slow.sh,5,attack,0,,,1
+attack_fast,attack,1,850.0,12
+benign_backup,benign,0,0.0,50
+benign_backup,benign,0,0.0,50
+benign_backup,benign,0,0.0,50
+attack_fast,attack,1,1198.0,29
+attack_fast,attack,1,1198.0,29
+benign_backup,benign,0,0.0,50
+benign_backup,benign,0,0.0,50
+attack_fast,attack,1,1199.0,29
+attack_fast,attack,1,1199.0,29
+attack_copy_delete,attack,1,1144.0,24
+attack_copy_delete,attack,1,1144.0,24
+attack_slow,attack,1,2849.0,29
+attack_slow,attack,1,2849.0,29
