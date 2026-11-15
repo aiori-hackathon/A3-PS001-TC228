@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="30dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RansomGuard"
+            android:textColor="#172B4D"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Android Ransomware Early Warning System"
+            android:textColor="#64748B"
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:background="#FFFFFF">
+
+            <TextView
+                android:text="MONITORING STATUS"
+                android:textColor="#64748B"
+                android:textSize="12sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SYSTEM NORMAL"
+                android:textColor="#15803D"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/fileCountText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Laboratory files: 100"
+                android:textColor="#334155"
+                android:textSize="16sp"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/riskText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Risk score: 0/10"
+                android:textColor="#334155"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/monitorButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="START MONITORING"
+            android:layout_marginTop="18dp" />
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RESET LAB FILES" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="BENIGN SIMULATIONS"
+            android:textColor="#172B4D"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="24dp" />
+
+        <Button
+            android:id="@+id/backupButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Run Benign Backup" />
+
+        <Button
+            android:id="@+id/editorButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Run Benign Editor" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ATTACK SIMULATIONS"
+            android:textColor="#172B4D"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="20dp" />
+
+        <Button
+            android:id="@+id/fastAttackButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Simulate Fast Attack" />
+
+        <Button
+            android:id="@+id/copyDeleteButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Simulate Copy/Delete Attack" />
+
+        <Button
+            android:id="@+id/slowAttackButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Simulate Slow Attack" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="FILE ACTIVITY ANALYTICS"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#172B4D"
+            android:layout_marginTop="24dp" />
+
+        <com.example.ransomguard.EventChartView
+            android:id="@+id/eventChart"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="#FFFFFF"
+            android:padding="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:text="Detection Delay"
+                    android:textColor="#64748B"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/delayText"
+                    android:text="-- ms"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#172B4D"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="12dp"
+                android:layout_height="1dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:text="Files Changed"
+                    android:textColor="#64748B"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/changedFilesText"
+                    android:text="--"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#172B4D"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <Button
+                    android:id="@+id/resultsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="VIEW RESULTS" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ACTIVITY LOG"
+            android:textColor="#172B4D"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/logText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:padding="14dp"
+            android:text="Application started."
+            android:textColor="#334155"
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:layout_marginTop="10dp" />
+
+    </LinearLayout>
+
+</ScrollView>
+

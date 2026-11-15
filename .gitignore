@@ -1,39 +1,15 @@
-
-# Python cache files
-__pycache__/
-*.py[cod]
-
-# Python virtual environments
-venv/
-.env/
-
-# Temporary files
-*.tmp
-*.log
-
-# Operating system files
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# IDE files
-.vscode/
-.idea/
-
-# Generated experiment output
-data/temp/
-
-# Generated test files
-test_files/
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Generated evaluation results
-data/results.csv
-
-# Android build files
-.gradle/
-**/build/
+/build
+/captures
+.externalNativeBuild
+.cxx
 local.properties
