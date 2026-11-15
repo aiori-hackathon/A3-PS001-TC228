@@ -442,10 +442,8 @@ By combining controlled workload simulations, file activity analysis, sliding-wi
 Further testing and improvements are required to validate detection accuracy, response speed, and reliability across different workload patterns.
 
 ### Video
-https://github.com/user-attachments/assets/9491ad6c-6f87-47cb-88f4-d531bfca0c27
 
-if the video is not playing, it is uploaded with files
-
+Video is with the files ransomgaurd.mp4
 
 
 
