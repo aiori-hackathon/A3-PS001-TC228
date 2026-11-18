@@ -1,451 +1,289 @@
-# AIORI-3-HACKATHON-PROJECTS
 
-**##Team Introduction Video**\
-Youtube: https://youtu.be/WaHb90-Qao0
+# RansomGuard – Android Ransomware Early Warning System
 
-# Android Ransomware Early Warning System
+**Team Kenshin — A3-PS001-TC228**
 
-## Team Kenshin — A3-PS001-TC228
+RansomGuard is a Kotlin-based Android laboratory prototype that monitors file activity in a designated app-private test directory and raises an alert when activity matches predefined ransomware-like patterns.
 
-### 1. Project Overview
+> **Scope:** RansomGuard is a controlled research/demo prototype. It monitors only its own app-private lab directory; it is not device-wide Android protection and does not detect or stop real ransomware on a device.
 
-The Android Ransomware Early Warning System is a laboratory prototype designed to identify suspicious file activity that resembles ransomware behavior on an Android emulator.
+## 1. Project Overview
 
-The project monitors a designated test directory, observes file changes, analyzes suspicious activity within a time window, and attempts to stop a controlled test workload when suspicious behavior is detected.
+Ransomware commonly performs repeated file operations, such as modifying, renaming, replacing, or deleting files. RansomGuard demonstrates how event-driven file monitoring and rule-based analysis can identify suspicious patterns during controlled simulations.
 
-The system uses Python, Android Debug Bridge (ADB), shell scripts, and rule-based detection.
+The application creates a lab directory in its private internal storage (`filesDir/ranslab`), populates it with 100 dummy files, monitors file-system events using Android `FileObserver`, runs two benign and three ransomware-like workload simulations, displays alerts, and saves experiment results locally.
 
-The primary objective is to demonstrate how ransomware-like file operations can be monitored and detected before a simulated attack processes all test files.
+## 2. Project Objectives
 
-### 2. Project Objectives
+- Build a controlled Android ransomware-simulation environment.
+- Generate 100 dummy files for safe testing.
+- Simulate normal file activity and ransomware-like behavior.
+- Monitor file creation, modification, deletion, and rename-related events.
+- Detect suspicious activity using configurable rule-based thresholds.
+- Display an alert when detection conditions are met.
+- Cooperatively stop the controlled simulation after an alert.
+- Record detection delay, files changed before alert, and evaluation metrics.
 
-- Create a controlled Android ransomware simulation environment.
-- Generate approximately 100 dummy files for testing.
-- Simulate normal file operations and ransomware-like behavior.
-- Monitor file creation, modification, renaming, and deletion.
-- Identify suspicious activity using a sliding time window.
-- Generate alerts when detection thresholds are reached.
-- Attempt to terminate the controlled test workload.
-- Evaluate detection performance using precision, recall, and detection delay.
+## 3. System Architecture
 
-### 3. System Architecture
+### Android Application and Lab Directory
 
-The project consists of five main components.
+The app uses its private internal storage. The lab directory is `filesDir/ranslab/` and contains 100 dummy files. Simulations operate on these test files rather than personal documents.
 
-**1. Android Test Environment**
+### Workload Simulations
 
-An Android Virtual Device (AVD) is used as the testing environment.
+The app includes five controlled workloads:
 
-The designated laboratory directory is:
+1. Benign Backup
+2. Benign Editor
+3. Fast Attack
+4. Copy-Delete Attack
+5. Slow Attack
 
-`/sdcard/ranslab/`
+### File Monitoring
 
-It contains approximately 100 dummy files.
+Android `FileObserver` monitors the designated lab directory for:
 
-**2. Workload Simulation**
+- `CREATE`
+- `MODIFY`
+- `DELETE`
+- `MOVED_FROM`
+- `MOVED_TO`
+- `CLOSE_WRITE`
 
-Five shell scripts simulate different file-operation patterns:
+Rename-related activity is inferred from move events and the application's file tracking.
 
-- Benign Backup
-- Benign Editor
-- Fast Attack
-- Copy-and-Delete Attack
-- Slow Attack
+### Detection Engine
 
-**3. File Monitoring**
+The detection engine tracks cumulative unique-file activity for detection. A separate rolling 3-second event window is used for recent activity analytics and chart display.
 
-A Python-based detector communicates with Android through ADB.
+### Alert and Response
 
-It periodically collects file information, including:
+When a suspicious rule is satisfied, the app displays an alert, records detection metrics, and sets a shared stop flag. The controlled workload checks this flag and stops cooperatively.
 
-- Filename
-- File size
-- Modification timestamp
+**Important:** The app does not identify and terminate an independent attacker process or use PID-based process killing.
 
-The detector compares consecutive snapshots to identify changes.
+### Results and Storage
 
-**4. Detection and Response**
+Experiment results are saved locally using Android `SharedPreferences` in JSON format. The Results screen calculates and displays confusion-matrix metrics and average detection measurements.
 
-The detector analyzes observed file activity using a sliding time window and configurable thresholds.
-
-When suspicious activity is identified, it generates an alert and requests termination of the controlled test workload.
-
-**5. Evaluation**
-
-The evaluator is designed to run repeated workload experiments and record:
-
-- Detection status
-- Detection delay
-- Files changed before detection
-- Process termination status
-- Precision
-- Recall
-
-### 4. Technologies Used
+## 4. Technologies Used
 
 | Technology | Purpose |
 |---|---|
-| Python 3 | Detection and evaluation |
-| Android Studio | Android development environment |
-| Android Virtual Device | Simulation environment |
-| ADB | Communication with Android |
-| Shell scripting | Workload simulation |
-| PowerShell | Windows automation |
-| CSV | Experiment result storage |
+| Kotlin | Android application and workload implementation |
+| Android Studio | Development and debugging |
+| Android SDK / Android Emulator | Build and controlled test environment |
+| Android `FileObserver` | Event-driven monitoring of the lab directory |
+| SharedPreferences | Local experiment-history storage |
+| JSON | Serialization of experiment results |
 | Git and GitHub | Version control and collaboration |
 
-### 5. Project Directory Structure
+## 5. Workload Descriptions
 
-```text
-A3-PS001-TC228-temp/
-│
-├── README.md
-├── .gitignore
-│
-├── workloads/
-│   ├── benign_backup.sh
-│   ├── benign_editor.sh
-│   ├── attack_fast.sh
-│   ├── attack_copy_delete.sh
-│   └── attack_slow.sh
-│
-├── detector/
-│   └── detector.py
-│
-├── evaluator/
-│   └── evaluator.py
-│
-├── data/
-│   └── results.csv
-│
-├── test_files/
-│
-├── create_test_files.ps1
-└── reset_lab.ps1
+### 5.1 Benign Backup
+
+Simulates legitimate backup-like activity by creating multiple files in the lab directory.
+
+**Expected outcome:** No ransomware alert.
+
+### 5.2 Benign Editor
+
+Simulates normal editing by repeatedly modifying a file.
+
+**Expected outcome:** No ransomware alert.
+
+### 5.3 Fast Attack
+
+Simulates rapid ransomware-like behavior by modifying files and renaming them with a `.locked` extension.
+
+**Expected outcome:** Suspicious activity alert.
+
+### 5.4 Copy-Delete Attack
+
+Simulates replacement-style activity by creating `.encrypted` copies and deleting original files.
+
+**Expected outcome:** Suspicious activity alert.
+
+### 5.5 Slow Attack
+
+Simulates slower file modifications and renaming. It selects a randomized workload of approximately 35–85 files, shuffles the selected files, and introduces randomized delays of approximately 120–350 ms between operations.
+
+**Expected outcome:** Detection if cumulative activity reaches the configured rules.
+
+**Slow Simulation Limitation:** Randomized delays make this workload slower, but it remains a controlled, rule-based simulation. It does not establish that the prototype can detect every real-world slow ransomware technique. The detector relies on cumulative unique-file activity and fixed thresholds; it does not currently use machine learning or entropy analysis.
+
+All workloads operate only on dummy files in the app-private lab directory.
+
+## 6. Detection Methodology
+
+The current suspicious-activity conditions are:
+
+```kotlin
+val suspicious =
+    (analytics.modified >= 15 && analytics.renamed >= 10) ||
+    (analytics.created >= 12 && analytics.deleted >= 12)
 ```
 
-### 6. Workload Description
+An alert is triggered when either:
 
-The system includes five simulated workloads.
+- At least 15 unique files have been modified AND at least 10 unique files have been renamed; OR
+- At least 12 unique files have been created AND at least 12 unique files have been deleted.
 
-#### 6.1 Benign Backup
+### Risk Scoring
 
-Simulates normal backup activity by creating multiple files in the laboratory directory.
-
-Expected behavior:
-- Multiple file creation events.
-- No mass file renaming.
-- No ransomware alert under the intended detection configuration.
-
-#### 6.2 Benign Editor
-
-Simulates normal document editing by repeatedly modifying a single file.
-
-Expected behavior:
-- Repeated modifications.
-- Limited file activity.
-- No ransomware alert under the intended detection configuration.
-
-#### 6.3 Fast Attack
-
-Simulates rapid ransomware-like behavior by modifying dummy files and renaming them with a `.locked` extension.
-
-Expected behavior:
-- Multiple modification events.
-- Multiple inferred rename events.
-- Suspicious activity alert.
-
-#### 6.4 Copy-and-Delete Attack
-
-Simulates ransomware-like replacement behavior by creating replacement files with an `.encrypted` extension and deleting the original dummy files.
-
-Expected behavior:
-- Multiple file creation events.
-- Multiple deletion events.
-- Suspicious activity alert.
-
-#### 6.5 Slow Attack
-
-Simulates slower ransomware-like file modifications and renaming.
-
-Expected behavior:
-- Repeated file modifications.
-- Inferred renames over a longer period.
-- Evaluation of detection performance against slower activity.
-
-**Note:** These are controlled laboratory simulations. They do not implement real encryption or target personal files.
-
-### 7. Installation and Requirements
-
-Before running the project, install:
-
-- Windows 10 or Windows 11
-- Python 3.x
-- Android Studio
-- Android SDK Platform Tools
-- Android Emulator
-- Git
-
-Verify Python:
-
-```powershell
-python --version
-```
-
-Verify ADB:
-
-```powershell
-adb version
-```
-
-Check connected Android devices:
-
-```powershell
-adb devices
-```
-
-The project uses an Android emulator with a Google APIs system image for laboratory testing.
-
-### 8. Laboratory Setup
-
-Create the test directory:
-
-```powershell
-adb shell "mkdir -p /sdcard/ranslab"
-```
-
-Generate the dummy files using:
-
-```powershell
-.\create_test_files.ps1
-```
-
-Push the generated files:
-
-```powershell
-adb push .\test_files\ /sdcard/ranslab/
-```
-
-Verify the files:
-
-```powershell
-adb shell "ls -l /sdcard/ranslab"
-```
-
-The laboratory should contain approximately 100 dummy files before an experiment.
-
-### 9. Upload Workloads to Android
-
-Push the workload directory:
-
-```powershell
-adb push workloads /data/local/tmp/
-```
-
-Set executable permissions:
-
-```powershell
-adb shell "chmod +x /data/local/tmp/workloads/*.sh"
-```
-
-The workload scripts can be executed individually using:
-
-```powershell
-adb shell "sh /data/local/tmp/workloads/benign_backup.sh"
-```
-
-Other workload scripts can be launched by replacing the filename.
-
-### 10. Running the Detector
-
-From the project root directory, run:
-
-```powershell
-python .\detector\detector.py
-```
-
-The detector presents five workload options.
-
-```text
-1. benign_backup.sh
-2. benign_editor.sh
-3. attack_fast.sh
-4. attack_copy_delete.sh
-5. attack_slow.sh
-```
-
-Select the required workload and press Enter to begin monitoring.
-
-The detector takes an initial snapshot and compares subsequent snapshots to identify file changes.
-
-### 11. Detection Methodology
-
-The prototype uses snapshot-based file monitoring.
-
-The main monitoring operations are:
-
-1. Collect the current file snapshot.
-2. Compare it with the previous snapshot.
-3. Identify newly created files.
-4. Identify modified files.
-5. Infer possible renames from disappeared and newly appearing filenames.
-6. Identify deleted files.
-7. Maintain recent events within a configurable sliding window.
-8. Calculate suspicious activity statistics.
-9. Generate an alert when configured detection conditions are met.
-
-Initial experimental configuration:
-
-| Parameter | Initial Value |
+| Condition | Risk Score |
 |---|---:|
-| Polling interval | 200 ms |
-| Sliding window | 3 seconds |
-| Modified file threshold | More than 15 |
-| Inferred rename threshold | More than 10 |
+| Suspicious detection rule satisfied | 10/10 |
+| At least 8 modified files or 8 renamed files | 7/10 |
+| At least 4 modified files or 8 created files | 4/10 |
+| Otherwise | 0/10 |
 
-Thresholds may be adjusted during experiments to evaluate detection performance.
+These are experimental thresholds selected for the controlled lab workloads, not universal ransomware signatures.
 
-### 12. Response Mechanism
+### Monitoring Window vs Detection Tracking
 
-When suspicious activity is detected, the prototype:
+- **Rolling Analytics:** A 3-second event window is used to display recent file activity in the chart.
+- **Cumulative Detection Analytics:** Cumulative unique-file tracking is used by the detection engine to evaluate the workload.
 
-- Generates a ransomware-like activity alert.
-- Displays the number of modified files and inferred renames.
-- Identifies the controlled workload PID.
-- Requests termination of the test workload.
+The chart and detector therefore do not necessarily show identical counts at every moment.
 
-Process termination must be verified during testing rather than assumed from the termination request.
+## 7. Running the Project
 
-### 13. Evaluation Methodology
+1. Open the RansomGuard project in Android Studio.
+2. Allow Gradle sync to complete.
+3. Start an Android emulator.
+4. Select the emulator as the run target.
+5. Click **Run** in Android Studio, or install the generated APK.
+6. Open RansomGuard.
+7. Start monitoring and run the workloads from the app.
+8. Open the Results screen to review saved experiment history and evaluation metrics.
 
-The evaluator is designed to test all five workloads repeatedly.
+Use **Reset Lab Files** to restore the lab files between demonstrations when needed.
 
-Initial proposed experiment plan:
+Use **Clear Experiment History** to clear saved evaluation records.
 
-| Workload | Planned Runs |
+## 8. Evaluation Methodology
+
+Each experiment records:
+
+- Workload name and expected classification.
+- Whether an alert was detected.
+- Detection delay, when detected.
+- Number of files changed before the alert.
+
+### Evaluation Metrics
+
+**True Positive (TP):** An attack workload correctly detected.
+
+**False Positive (FP):** A benign workload incorrectly detected as an attack.
+
+**True Negative (TN):** A benign workload correctly completed without an alert.
+
+**False Negative (FN):** An attack workload that was not detected.
+
+**Precision:**
+
+`TP / (TP + FP) × 100`
+
+Measures the proportion of detected attack classifications that were correct.
+
+**Recall:**
+
+`TP / (TP + FN) × 100`
+
+Measures the proportion of attack workloads that were detected.
+
+**Accuracy:**
+
+`(TP + TN) / Total Experiments × 100`
+
+Measures the proportion of all experiment classifications that were correct.
+
+**Average Detection Delay:** Average delay across detected attack experiments with a recorded delay.
+
+**Average Files Changed Before Alert:** Average number of files changed before alert across detected attack experiments.
+
+## 9. Initial Demonstration Results
+
+The following results are from the initial demonstration of one run per workload. They are NOT the completed 25-run evaluation.
+
+### 9.1 Workload Results
+
+| Workload | Outcome | Detection Delay | Files Changed Before Alert |
+|---|---|---:|---:|
+| Benign Backup | No alert | — | — |
+| Benign Editor | No alert | — | — |
+| Fast Attack | Detected | 1,217 ms | 15 |
+| Copy-Delete Attack | Detected | 1,145 ms | 12 |
+| Slow Attack | Detected | 2,886 ms | 15 |
+
+### 9.2 Initial Evaluation Summary
+
+| Metric | Initial Result |
 |---|---:|
-| Benign Backup | 5 |
-| Benign Editor | 5 |
-| Fast Attack | 5 |
-| Copy-and-Delete Attack | 5 |
-| Slow Attack | 5 |
-| **Total** | **25** |
+| Total Experiments | 5 |
+| True Positives | 3 |
+| False Positives | 0 |
+| True Negatives | 2 |
+| False Negatives | 0 |
+| Precision | 100% |
+| Recall | 100% |
+| Accuracy | 100% |
+| Average Detection Delay | 1,749.33 ms |
+| Average Files Changed Before Alert | 14.00 |
 
-The evaluator records experiment results in:
+These results describe a small controlled demonstration only. A 100% score on five experiments does not establish performance against real-world ransomware or guarantee the same result in larger tests.
 
-`data/results.csv`
+## 10. Next Milestones
 
-The following metrics are used.
+- Complete the 25-run evaluation (five runs per workload).
+- Evaluate detection consistency, false positives, and false negatives.
+- Refine detection thresholds based on repeated experimental results.
+- Test the final APK and improve application reliability.
+- Report results from the completed evaluation separately from the initial demonstration.
 
-**Detection Delay**
+## 11. Limitations
 
-Time between the beginning of a simulated attack and the generated alert.
+- Monitoring is limited to the app-private `filesDir/ranslab` directory.
+- The prototype does not provide device-wide ransomware protection.
+- Detection uses rule-based thresholds and cumulative unique-file tracking.
+- The rolling 3-second chart analytics are separate from cumulative detection analytics.
+- Slow Attack is a controlled simulation and does not represent every real-world slow ransomware technique.
+- The simulations do not use real ransomware or perform real encryption.
+- The response cooperatively stops the app's own controlled workload; it does not terminate an independent attacker process.
+- Initial evaluation results are based on only five experiments. The planned 25-run evaluation remains outstanding.
+- Thresholds may need retuning for different workloads and device performance.
 
-**Files Changed Before Alert**
+## 12. Future Improvements
 
-Number of files observed as changed before the detector generates an alert.
+- Explore entropy-based analysis as an additional detection signal.
+- Improve behavioural analysis and risk scoring.
+- Expand controlled workload patterns and evaluation datasets.
+- Evaluate detection consistency across repeated trials.
+- Improve dashboard visualizations and experiment reporting.
+- Investigate broader Android monitoring capabilities within Android's security and permission restrictions.
 
-**Precision**
+## 13. Safety and Ethical Considerations
 
-TP / (TP + FP)
+All tests are conducted in a controlled Android application environment using dummy files stored in the app-private lab directory.
 
-Measures how many generated alerts correspond to actual attack workloads.
+The simulations are intended for academic research, cybersecurity education, and controlled testing. They do not target personal documents or production data.
 
-**Recall**
+## Conclusion
 
-TP / (TP + FN)
+RansomGuard demonstrates an Android-based, event-driven approach to identifying suspicious file activity in a controlled laboratory directory.
 
-Measures how many attack workloads are successfully detected.
+By combining `FileObserver`, rule-based detection, controlled workloads, alerts, and local experiment evaluation, the prototype provides a foundation for further study of Android ransomware early warning.
 
-**Termination Rate**
+The initial five-experiment demonstration detected all three simulated attack workloads without alerting on the two benign workloads. Further repeated testing and development are required before drawing conclusions about broader detection reliability.
 
-Percentage of controlled test workloads successfully terminated after detection.
+## Demo Video
 
-Actual performance values will be reported after completing and validating the experiments.
+Add the demo video to the repository and link it here. For example:
 
-### 14. Expected Results
+```markdown
+[Watch the RansomGuard demo](./ransomguard.mp4)
+```
 
-The intended system behavior is:
-
-| Workload | Expected Classification |
-|---|---|
-| Benign Backup | Benign |
-| Benign Editor | Benign |
-| Fast Attack | Suspicious |
-| Copy-and-Delete Attack | Suspicious |
-| Slow Attack | Suspicious |
-
-These are expected outcomes, not measured results. Actual detection performance depends on emulator performance, polling behavior, workload execution, and detection thresholds.
-
-### 15. Current Development Status
-
-The project is being developed and tested in stages.
-
-| Component | Status |
-|---|---|
-| Android emulator setup | Completed |
-| ADB communication | Working |
-| Dummy file generation | Working |
-| Benign backup workload | Created and tested |
-| Benign editor workload | Created and monitored |
-| Fast attack workload | Created and independently tested |
-| Copy-and-delete workload | Requires final script correction and testing |
-| Slow attack workload | Requires validation |
-| Python snapshot monitoring | Implemented |
-| Sliding-window detection | Implemented; requires validation |
-| Automatic process termination | Requires validation |
-| Evaluation framework | Implemented; requires validation |
-| Final performance measurements | Pending |
-
-### 16. Limitations
-
-- The prototype monitors a designated laboratory directory rather than the entire Android device.
-- Snapshot polling can miss file operations occurring between observations.
-- Rename events are inferred from file disappearance and appearance; they are not direct filesystem rename notifications.
-- ADB polling introduces communication overhead and may affect detection timing.
-- Detection thresholds require experimental tuning.
-- The prototype does not provide complete device-wide ransomware protection.
-- Process termination is designed for controlled laboratory workloads.
-
-### 17. Future Improvements
-
-Possible future enhancements include:
-
-- Implementing Android FileObserver-based monitoring.
-- Improving detection of rapid file operations.
-- Adding entropy-based analysis as an additional detection signal.
-- Improving detection of copy-and-delete behavior.
-- Implementing more advanced risk scoring.
-- Building a graphical monitoring dashboard.
-- Expanding the evaluation dataset.
-- Comparing different detection thresholds and configurations.
-
-### 18. Safety and Ethical Considerations
-
-All experiments are conducted in a controlled Android emulator environment.
-
-The test scripts operate exclusively on dummy files inside:
-
-`/sdcard/ranslab/`
-
-The project does not target personal documents, real user data, or production Android devices.
-
-The simulated workloads are intended only for academic research, security education, and controlled testing.
-
-
-### Conclusion
-
-The Android Ransomware Early Warning System demonstrates a laboratory-based approach to identifying suspicious file activity using snapshot monitoring and rule-based detection.
-
-By combining controlled workload simulations, file activity analysis, sliding-window detection, and process response, the project provides a foundation for studying ransomware-like behavior on Android.
-
-Further testing and improvements are required to validate detection accuracy, response speed, and reliability across different workload patterns.
-
-### Video
-https://github.com/user-attachments/assets/9491ad6c-6f87-47cb-88f4-d531bfca0c27
-
-if the video is not playing, it is uploaded with files
-
-
-
-
+Update the filename above to match the actual video filename committed to the repository.
